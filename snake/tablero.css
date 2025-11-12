@@ -1,0 +1,95 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: rgba(0, 0, 0, 0.9);
+    text-align: center;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h2 {
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    color: #00ff95;
+}
+#tablero {
+    display: grid;
+    grid-template-columns: repeat(20, 25px);
+    grid-template-rows: repeat(20, 25px);
+    gap: 2px;
+    margin: 20px auto;
+    box-shadow: 0 0 20px rgba(0, 255, 64, 0.3);
+    border-radius: 10px;
+}
+
+.celda {
+    width: 25px;
+    height: 25px;
+    background-color: #3a0066;
+    border: 1px solid #220033;
+    border-radius: 7px;
+    transition: background-color 0.1s;
+}
+
+.celda.snake {
+    background-color: rgb(0, 255, 64);
+    box-shadow: 0 0 10px rgba(0, 255, 64, 0.8);
+}
+
+.celda.food {
+    background-color: #ff0055;
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.8);
+}
+
+button {
+    background-color: rgb(14, 170, 0);
+    border: none;
+    border-radius: 40px;
+    color: white;
+    padding: 10px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: rgb(18, 200, 0);
+    transform: scale(1.05);
+}
+
+#puntos {
+    color: #00ff95;
+    font-weight: bold;
+}
+.celda.snake-head {
+    background-color: rgb(0, 255, 64);
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 255, 64, 0.8);
+}
+
+.celda.snake-head::after {
+    content: "X";
+    color: black;
+    font-weight: bold;
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.celda.snake-head {
+    background-color: rgb(0, 255, 64);
+    position: relative;
+}
+
+.celda.snake-head::after {
+    content: "X";
+    color: black;
+    font-weight: bold;
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
