@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="tablero.css">
+</head>
+<body>
+    <h3>Snake Game</h3>
+    <div>Puntuación: <span id="puntos">0</span></div>
+    <div id="tablero"></div>
+    <button id="startBtn">Iniciar partida</button>
+    <script>
+        const tablero = document.getElementById('tablero');
+        const startBtn = document.getElementById('startBtn');
+        const puntos = document.getElementById('puntos');
+
+        // Crear tablero 20x20
+        for (let fila = 0; fila < 20; fila++) {
+            for (let col = 0; col < 20; col++) {
+                const celda = document.createElement('div');
+                celda.classList.add('celda');
+                celda.dataset.fila = fila;
+                celda.dataset.col = col;
+                tablero.appendChild(celda);
+            }
+        }
+
+        function getCelda(fila, col) {
+            return document.querySelector(`.celda[data-fila="${fila}"][data-col="${col}"]`);
+        }
+
+        let snake = [];
+        let direccion = 'derecha';
+        let intervalo;
+
+        startBtn.addEventListener('click', () => {
+            document.querySelectorAll('.celda').forEach(c => c.classList.remove('snake', 'snake-head', 'food'));
+            puntos.textContent = 0;
+            clearInterval(intervalo);
+
+            const centroFila = 10;
+            const centroCol = 7;
+            snake = [
+                { fila: centroFila, col: centroCol },
+                { fila: centroFila, col: centroCol - 1 },
+                { fila: centroFila, col: centroCol - 2 }
+            ];
+
+            direccion = 'derecha';
+            dibujarSnake();
+            generarComida();
+            intervalo = setInterval(moverSnake, 300);
+        });
+
+        function dibujarSnake() {
+            document.querySelectorAll('.celda').forEach(c => c.classList.remove('snake', 'snake-head'));
+            snake.forEach((segmento, index) => {
+                const celda = getCelda(segmento.fila, segmento.col);
+                if (index === 0) {
+                    celda.classList.add('snake-head');
+                } else {
+                    celda.classList.add('snake');
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' && direccion !== 'abajo') direccion = 'arriba';
+            else if (e.key === 'ArrowDown' && direccion !== 'arriba') direccion = 'abajo';
+            else if (e.key === 'ArrowLeft' && direccion !== 'derecha') direccion = 'izquierda';
+            else if (e.key === 'ArrowRight' && direccion !== 'izquierda') direccion = 'derecha';
+        });
+
+        function moverSnake() {
+            const cabeza = { ...snake[0] };
+
+            switch (direccion) {
+                case 'arriba': cabeza.fila--; break;
+                case 'abajo': cabeza.fila++; break;
+                case 'izquierda': cabeza.col--; break;
+                case 'derecha': cabeza.col++; break;
+            }
+
+            if (cabeza.fila < 0 || cabeza.fila >= 20 || cabeza.col < 0 || cabeza.col >= 20 ||
+                snake.some(seg => seg.fila === cabeza.fila && seg.col === cabeza.col)) {
+                alert('¡Game Over!');
+                clearInterval(intervalo);
+                return;
+            }
+
+            const comida = document.querySelector('.food');
+            const filaComida = parseInt(comida.dataset.fila);
+            const colComida = parseInt(comida.dataset.col);
+
+            if (cabeza.fila === filaComida && cabeza.col === colComida) {
+                puntos.textContent = parseInt(puntos.textContent) + 10;
+                comida.classList.remove('food');
+                generarComida();
+            } else {
+                snake.pop();
+            }
+
+            snake.unshift(cabeza);
+            dibujarSnake();
+        }
+
+        function generarComida() {
+            let fila, col;
+            do {
+                fila = Math.floor(Math.random() * 20);
+                col = Math.floor(Math.random() * 20);
+            } while (snake.some(seg => seg.fila === fila && seg.col === col));
+            const celda = getCelda(fila, col);
+            celda.classList.add('food');
+        }
+    </script>
+</body>
+</html>
