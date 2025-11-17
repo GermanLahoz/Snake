@@ -16,7 +16,6 @@
         const startBtn = document.getElementById('startBtn');
         const puntos = document.getElementById('puntos');
 
-        // Crear tablero 20x20
         for (let fila = 0; fila < 20; fila++) {
             for (let col = 0; col < 20; col++) {
                 const celda = document.createElement('div');
@@ -55,16 +54,29 @@
         });
 
         function dibujarSnake() {
-            document.querySelectorAll('.celda').forEach(c => c.classList.remove('snake', 'snake-head'));
+            document.querySelectorAll('.celda').forEach(c => {
+                c.classList.remove('snake', 'snake-head');
+                c.style.transform = '';
+            });
+
             snake.forEach((segmento, index) => {
                 const celda = getCelda(segmento.fila, segmento.col);
                 if (index === 0) {
                     celda.classList.add('snake-head');
+
+                    switch(direccion) {
+                        case 'arriba': celda.style.transform = 'rotate(180deg)'; break;
+                        case 'abajo': celda.style.transform = 'rotate(0deg)'; break;
+                        case 'izquierda': celda.style.transform = 'rotate(90deg)'; break;
+                        case 'derecha': celda.style.transform = 'rotate(-90deg)'; break;
+                    }
                 } else {
                     celda.classList.add('snake');
                 }
             });
         }
+
+
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowUp' && direccion !== 'abajo') direccion = 'arriba';
