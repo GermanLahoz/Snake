@@ -1,95 +1,127 @@
+/*ESTILOS GENERALES*/
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: rgba(0, 0, 0, 0.9);
+    background: radial-gradient(circle at center, #0d001a 0%, #000 100%);
     text-align: center;
     color: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0px 0;
 }
+
+/*TÍTULO*/
 h2 {
     margin-bottom: 10px;
     letter-spacing: 2px;
     color: #00ff95;
+    text-shadow: 0 0 10px rgba(0, 255, 149, 0.8);
 }
+
+/*TABLERO*/
 #tablero {
     display: grid;
     grid-template-columns: repeat(20, 25px);
     grid-template-rows: repeat(20, 25px);
     gap: 2px;
     margin: 20px auto;
-    box-shadow: 0 0 20px rgba(0, 255, 64, 0.3);
-    border-radius: 10px;
+    padding: 10px;
+    background: rgba(0, 255, 64, 0.1);
+    box-shadow: 0 0 30px rgba(0, 255, 64, 0.3);
+    border-radius: 15px;
+    transition: transform 0.2s;
 }
 
+#tablero:hover {
+    transform: scale(1.01);
+}
+
+/*CELDAS*/
 .celda {
     width: 25px;
     height: 25px;
-    background-color: #3a0066;
-    border: 1px solid #220033;
-    border-radius: 7px;
-    transition: background-color 0.1s;
+    background-color: #2a004d;
+    border-radius: 6px;
+    box-shadow: inset 0 0 4px #000;
+    transition: background-color 0.15s, box-shadow 0.15s;
 }
 
+/* Cuerpo de la serpiente */
 .celda.snake {
     background-color: rgb(0, 255, 64);
-    box-shadow: 0 0 10px rgba(0, 255, 64, 0.8);
+    box-shadow: 0 0 10px rgba(0, 255, 64, 0.8), inset 0 0 4px rgba(0, 0, 0, 0.6);
 }
 
+/* Cabeza de la serpiente */
+.celda.snake-head {
+    background-color: rgb(0, 255, 100);
+    box-shadow: 0 0 15px rgba(0, 255, 100, 0.9), inset 0 0 5px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.celda.snake-head::after {
+    content: "X";
+    color: #000;
+    font-weight: 900;
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-shadow: 0 0 4px rgba(0, 255, 64, 0.6);
+}
+
+/* Comida */
 .celda.food {
     background-color: #ff0055;
-    box-shadow: 0 0 10px rgba(255, 0, 85, 0.8);
+    box-shadow: 0 0 12px rgba(255, 0, 85, 0.8);
+    border-radius: 50%;
+    animation: pulso 0.8s infinite alternate;
 }
 
+/*BOTONES*/
 button {
     background-color: rgb(14, 170, 0);
     border: none;
     border-radius: 40px;
     color: white;
-    padding: 10px 25px;
-    font-size: 16px;
+    padding: 10px 30px;
+    font-size: 17px;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    margin-top: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 64, 0.3);
 }
 
 button:hover {
     background-color: rgb(18, 200, 0);
-    transform: scale(1.05);
+    transform: scale(1.07);
+    box-shadow: 0 0 15px rgba(0, 255, 64, 0.5);
 }
 
+button:active {
+    transform: scale(0.97);
+}
+
+/*PUNTUACIÓN*/
 #puntos {
     color: #00ff95;
     font-weight: bold;
-}
-.celda.snake-head {
-    background-color: rgb(0, 255, 64);
-    position: relative;
-    box-shadow: 0 0 10px rgba(0, 255, 64, 0.8);
+    text-shadow: 0 0 5px rgba(0, 255, 149, 0.7);
 }
 
-.celda.snake-head::after {
-    content: "X";
-    color: black;
-    font-weight: bold;
-    font-size: 18px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-.celda.snake-head {
-    background-color: rgb(0, 255, 64);
-    position: relative;
-}
-
-.celda.snake-head::after {
-    content: "X";
-    color: black;
-    font-weight: bold;
-    font-size: 18px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+/*ANIMACIONES*/
+@keyframes pulso {
+    from {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    to {
+        transform: scale(1.15);
+        opacity: 1;
+    }
 }
