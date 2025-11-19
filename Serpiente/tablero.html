@@ -53,28 +53,43 @@
             intervalo = setInterval(moverSnake, 300);
         });
 
-        function dibujarSnake() {
-            document.querySelectorAll('.celda').forEach(c => {
-                c.classList.remove('snake', 'snake-head');
-                c.style.transform = '';
-            });
+        
+            function dibujarSnake() {
+        document.querySelectorAll('.celda').forEach(c => {
+            c.classList.remove('snake', 'snake-head', 'snake-tail');
+            c.style.transform = '';
+        });
 
-            snake.forEach((segmento, index) => {
-                const celda = getCelda(segmento.fila, segmento.col);
-                if (index === 0) {
-                    celda.classList.add('snake-head');
+        snake.forEach((segmento, index) => {
+            const celda = getCelda(segmento.fila, segmento.col);
 
-                    switch(direccion) {
-                        case 'arriba': celda.style.transform = 'rotate(180deg)'; break;
-                        case 'abajo': celda.style.transform = 'rotate(0deg)'; break;
-                        case 'izquierda': celda.style.transform = 'rotate(90deg)'; break;
-                        case 'derecha': celda.style.transform = 'rotate(-90deg)'; break;
-                    }
-                } else {
-                    celda.classList.add('snake');
+            if (index === 0) {
+                // Cabeza
+                celda.classList.add('snake-head');
+                switch(direccion) {
+                    case 'arriba': celda.style.transform = 'rotate(180deg)'; break;
+                    case 'abajo': celda.style.transform = 'rotate(0deg)'; break;
+                    case 'izquierda': celda.style.transform = 'rotate(90deg)'; break;
+                    case 'derecha': celda.style.transform = 'rotate(-90deg)'; break;
                 }
-            });
-        }
+            } else if (index === snake.length - 1) {
+                celda.classList.add('snake-tail');
+
+                const penultimo = snake[snake.length - 2];
+
+                if (segmento.fila < penultimo.fila) celda.style.transform = 'rotate(0deg)';
+                else if (segmento.fila > penultimo.fila) celda.style.transform = 'rotate(180deg)';
+                else if (segmento.col < penultimo.col) celda.style.transform = 'rotate(-90deg)';
+                else if (segmento.col > penultimo.col) celda.style.transform = 'rotate(90deg)';
+
+            } else {
+                // Cuerpo
+                celda.classList.add('snake');
+            }
+        });
+    }
+
+
 
 
 
