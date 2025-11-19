@@ -1,1 +1,0 @@
-Juego de la serpiente
