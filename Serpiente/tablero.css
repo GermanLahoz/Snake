@@ -75,6 +75,20 @@ h2 {
     transition: transform 0.15s;
 }
 
+.celda.snake-tail {
+    background-color: transparent;
+    background-image: url('IMG/triangulo.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 8px rgba(0, 255, 64, 0.6);
+    border-radius: 6px;
+
+    transform: rotate(180deg); /* por ejemplo, que mire hacia abajo */
+}
+
+
+
 
 /* Comida */
 .celda.food {
