@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero 20x20</title>
+    <style>
+        #tablero {
+            display: grid;
+            grid-template-columns: repeat(20, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 2px;
+        }
+
+        .celda {
+            width: 30px;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .celda:hover {
+            background-color: #a0e0ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tablero 20x20</h1>
+    <div id="tablero"></div>
+
+    <script>
+        const tablero = document.getElementById('tablero');
+
+        for (let fila = 0; fila < 20; fila++) {
+            for (let col = 0; col < 20; col++) {
+                const celda = document.createElement('div');
+                celda.classList.add('celda');
+                celda.dataset.fila = fila;
+                celda.dataset.col = col;
+
+
+                tablero.appendChild(celda);
+            }
+        }
+    </script>
+</body>
+</html>
