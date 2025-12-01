@@ -1,228 +1,259 @@
+let tablero = document.body.querySelector('#tablero');
+let startBtn = document.body.querySelector('#startBtn');
+let puntos = document.body.querySelector('#puntos');
+
+// Clase para manejar el dibujado de la serpiente
 class Serpiente {
     constructor() {
-        const fila = 10;
-        const col = 7;
-
-        this.direccion = "derecha";
-
-        this.segmentos = [
-            { fila: fila, col: col },
-            { fila: fila, col: col - 1 },
-            { fila: fila, col: col - 2 }
-        ];
+        this.direccion = 'derecha';
+        this.proximaDireccion = 'derecha'; 
+        this.direccionCambiada = false;
     }
 
-    obtenerCabeza() {
-        return this.segmentos[0];
-    }
-
-    cambiarDireccion(nueva) {
-        const opuestos = {
-            arriba: "abajo",
-            abajo: "arriba",
-            izquierda: "derecha",
-            derecha: "izquierda"
-        };
-
-        if (opuestos[nueva] !== this.direccion) {
-            this.direccion = nueva;
-        }
-    }
-
-    mover(comio) {
-        const cabeza = { ...this.obtenerCabeza() };
-
-        switch (this.direccion) {
-            case "arriba": cabeza.fila--; break;
-            case "abajo": cabeza.fila++; break;
-            case "izquierda": cabeza.col--; break;
-            case "derecha": cabeza.col++; break;
-        }
-
-        this.segmentos.unshift(cabeza);
-
-        if (!comio) {
-            this.segmentos.pop();
-        }
-    }
-
-    chocaCon(fila, col) {
-        return this.segmentos.some(s => s.fila === fila && s.col === col);
-    }
-}
-
-class Comida {
-    constructor(tablero, serpiente) {
-        this.tablero = tablero;
-        this.serpiente = serpiente;
-        this.fila = null;
-        this.col = null;
-        this.generar();
-    }
-
-    generar() {
-        let f, c;
-        do {
-            f = Math.floor(Math.random() * 20);
-            c = Math.floor(Math.random() * 20);
-        } while (this.serpiente.chocaCon(f, c));
-
-        this.fila = f;
-        this.col = c;
-    }
-}
-
-class Juego {
-    constructor() {
-        this.tablero = document.querySelector("#tablero");
-        this.puntos = document.querySelector("#puntos");
-        this.btn = document.querySelector("#startBtn");
-
-        this.serpiente = null;
-        this.comida = null;
-        this.intervalo = null;
-
-        this.crearTablero();
-        this.eventos();
-
-        console.log("Juego listo");
-    }
-
-    crearTablero() {
-        for (let fila = 0; fila < 20; fila++) {
-            for (let col = 0; col < 20; col++) {
-                const celda = document.createElement("div");
-                celda.classList.add("celda");
-                celda.dataset.fila = fila;
-                celda.dataset.col = col;
-                this.tablero.appendChild(celda);
-            }
-        }
-    }
-
-    getCelda(f, c) {
-        return document.querySelector(`.celda[data-fila="${f}"][data-col="${c}"]`);
-    }
-
-    iniciar() {
-        clearInterval(this.intervalo);
-
-        this.puntos.textContent = "0";
-
-        document.querySelectorAll(".celda").forEach(c =>
-            c.classList.remove("snake", "snake-head", "snake-tail", "food")
-        );
-
-        this.serpiente = new Serpiente();
-        this.comida = new Comida(this.tablero, this.serpiente);
-
-        this.dibujarSerpiente();
-        this.dibujarComida();
-
-        this.intervalo = setInterval(() => this.bucle(), 200);
-    }
-
-    eventos() {
-        this.btn.addEventListener("click", () => this.iniciar());
-
-        document.addEventListener("keydown", e => {
-            if (e.key === "ArrowUp") this.serpiente.cambiarDireccion("arriba");
-            if (e.key === "ArrowDown") this.serpiente.cambiarDireccion("abajo");
-            if (e.key === "ArrowLeft") this.serpiente.cambiarDireccion("izquierda");
-            if (e.key === "ArrowRight") this.serpiente.cambiarDireccion("derecha");
-        });
-    }
-
-    bucle() {
-        const cabeza = { ...this.serpiente.obtenerCabeza() };
-
-        // Mover una copia temporal para detectar colisión
-        switch (this.serpiente.direccion) {
-            case "arriba": cabeza.fila--; break;
-            case "abajo": cabeza.fila++; break;
-            case "izquierda": cabeza.col--; break;
-            case "derecha": cabeza.col++; break;
-        }
-
-        // Colisión paredes
-        if (cabeza.fila < 0 || cabeza.fila >= 20 || cabeza.col < 0 || cabeza.col >= 20) {
-            return this.gameOver();
-        }
-
-        // Colisión consigo misma
-        if (this.serpiente.chocaCon(cabeza.fila, cabeza.col)) {
-            return this.gameOver();
-        }
-
-        // ¿Come comida?
-        const come = cabeza.fila === this.comida.fila && cabeza.col === this.comida.col;
-
-        this.serpiente.mover(come);
-
-        if (come) {
-            this.puntos.textContent = parseInt(this.puntos.textContent) + 10;
-            this.comida.generar();
-        }
-
-        this.dibujar();
-    }
-
-    dibujar() {
-        document.querySelectorAll(".celda").forEach(c => {
-            c.classList.remove("snake", "snake-head", "snake-tail", "food");
-            c.style.transform = "";
+    dibujarSnake(snake) {
+        document.querySelectorAll('.celda').forEach(c => {
+            c.classList.remove('snake', 'snake-head', 'snake-tail');
+            c.style.transform = '';
         });
 
-        this.dibujarSerpiente();
-        this.dibujarComida();
-    }
+        snake.forEach((segmento, index) => {
+            const celda = this.getCelda(segmento.fila, segmento.col);
 
-    dibujarSerpiente() {
-        this.serpiente.segmentos.forEach((seg, i) => {
-            const celda = this.getCelda(seg.fila, seg.col);
-
-            if (i === 0) {
+            if (index === 0) {
                 // Cabeza
-                celda.classList.add("snake-head");
-                switch (this.serpiente.direccion) {
-                    case "arriba": celda.style.transform = "rotate(180deg)"; break;
-                    case "abajo": celda.style.transform = "rotate(0deg)"; break;
-                    case "izquierda": celda.style.transform = "rotate(90deg)"; break;
-                    case "derecha": celda.style.transform = "rotate(-90deg)"; break;
-                }
-                return;
-            }
-
-            if (i === this.serpiente.segmentos.length - 1) {
+                celda.classList.add('snake-head');
+                this.dibujarCabeza(celda);
+            } else if (index === snake.length - 1) {
                 // Cola
-                celda.classList.add("snake-tail");
-
-                const penultimo = this.serpiente.segmentos[this.serpiente.segmentos.length - 2];
-
-                if (seg.fila < penultimo.fila) celda.style.transform = "rotate(0deg)";
-                else if (seg.fila > penultimo.fila) celda.style.transform = "rotate(180deg)";
-                else if (seg.col < penultimo.col) celda.style.transform = "rotate(-90deg)";
-                else if (seg.col > penultimo.col) celda.style.transform = "rotate(90deg)";
-
-                return;
+                celda.classList.add('snake-tail');
+                this.dibujarCola(celda, segmento, snake[snake.length - 2]);
+            } else {
+                // Cuerpo
+                celda.classList.add('snake');
             }
-
-            // Cuerpo
-            celda.classList.add("snake");
-            celda.style.transform = ""; // Reset por si acaso
         });
     }
 
-
-    dibujarComida() {
-        const celda = this.getCelda(this.comida.fila, this.comida.col);
-        celda.classList.add("food");
+    dibujarCabeza(celda) {
+        switch (this.direccion) {
+            case 'arriba': celda.style.transform = 'rotate(180deg)'; break;
+            case 'abajo': celda.style.transform = 'rotate(0deg)'; break;
+            case 'izquierda': celda.style.transform = 'rotate(90deg)'; break;
+            case 'derecha': celda.style.transform = 'rotate(-90deg)'; break;
+        }
     }
 
-    gameOver() {
-        clearInterval(this.intervalo);
-        alert("¡Game Over!");
+    dibujarCola(celda, segmento, penultimo) {
+        if (segmento.fila < penultimo.fila) celda.style.transform = 'rotate(0deg)';
+        else if (segmento.fila > penultimo.fila) celda.style.transform = 'rotate(180deg)';
+        else if (segmento.col < penultimo.col) celda.style.transform = 'rotate(-90deg)';
+        else if (segmento.col > penultimo.col) celda.style.transform = 'rotate(90deg)';
+    }
+
+    getCelda(fila, col) {
+        return document.querySelector(`.celda[data-fila="${fila}"][data-col="${col}"]`);
+    }
+
+    setProximaDireccion(nuevaDireccion) {
+        // Solo permitir cambiar dirección si no se ha cambiado en este ciclo
+        if (!this.direccionCambiada) {
+            // Validar que no sea un giro de 180 grados
+            const opuestos = {
+                'arriba': 'abajo',
+                'abajo': 'arriba',
+                'izquierda': 'derecha',
+                'derecha': 'izquierda'
+            };
+
+            if (nuevaDireccion !== opuestos[this.direccion]) {
+                this.proximaDireccion = nuevaDireccion;
+                this.direccionCambiada = true;
+            }
+        }
+    }
+
+    actualizarDireccion() {
+        // Actualizar la dirección real solo al comienzo de cada movimiento
+        this.direccion = this.proximaDireccion;
+        this.direccionCambiada = false; // Resetear para el próximo ciclo
+    }
+
+    getDireccion() {
+        return this.direccion;
+    }
+
+    resetDireccion() {
+        this.direccion = 'derecha';
+        this.proximaDireccion = 'derecha';
+        this.direccionCambiada = false;
     }
 }
 
-new Juego();
+// Clase para manejar el movimiento de la serpiente
+class Juego {
+    constructor(Serpiente) {
+        this.Serpiente = Serpiente;
+    }
+
+    moverSnake(snake) {
+        const cabeza = { ...snake[0] };
+        
+        // Actualizar dirección antes de mover
+        this.Serpiente.actualizarDireccion();
+        
+        switch (this.Serpiente.getDireccion()) {
+            case 'arriba': cabeza.fila--; break;
+            case 'abajo': cabeza.fila++; break;
+            case 'izquierda': cabeza.col--; break;
+            case 'derecha': cabeza.col++; break;
+        }
+
+        return cabeza;
+    }
+
+    verificarColision(cabeza, snake) {
+        // Colisión con bordes
+        if (cabeza.fila < 0 || cabeza.fila >= 20 || 
+            cabeza.col < 0 || cabeza.col >= 20) {
+            return true;
+        }
+
+        // Colisión con el cuerpo (excepto la cola que se moverá)
+        for (let i = 0; i < snake.length - 1; i++) {
+            if (snake[i].fila === cabeza.fila && snake[i].col === cabeza.col) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    manejarComida(cabeza, snake, puntosElement) {
+        const comida = document.querySelector('.food');
+        const filaComida = parseInt(comida.dataset.fila);
+        const colComida = parseInt(comida.dataset.col);
+
+        if (cabeza.fila === filaComida && cabeza.col === colComida) {
+            puntosElement.textContent = parseInt(puntosElement.textContent) + 10;
+            comida.classList.remove('food');
+            return true; // Se comió la comida
+        }
+        return false; // No se comió la comida
+    }
+
+    actualizarSnake(snake, nuevaCabeza, comidaComida) {
+        if (!comidaComida) {
+            snake.pop();
+        }
+        snake.unshift(nuevaCabeza);
+        return snake;
+    }
+}
+
+// Clase para generar comida
+class Comida {
+    generarComida(snake) {
+        let fila, col;
+        let intentos = 0;
+        const maxIntentos = 400; // 20x20 = 400 celdas máximas
+
+        do {
+            fila = Math.floor(Math.random() * 20);
+            col = Math.floor(Math.random() * 20);
+            intentos++;
+            
+            // Prevenir bucle infinito
+            if (intentos >= maxIntentos) {
+                console.warn('No se pudo encontrar espacio para comida');
+                return null;
+            }
+        } while (snake.some(seg => seg.fila === fila && seg.col === col));
+
+        const celda = this.getCelda(fila, col);
+        celda.classList.add('food');
+        return { fila, col };
+    }
+
+    getCelda(fila, col) {
+        return document.querySelector(`.celda[data-fila="${fila}"][data-col="${col}"]`);
+    }
+}
+
+// Inicialización del tablero
+for (let fila = 0; fila < 20; fila++) {
+    for (let col = 0; col < 20; col++) {
+        const celda = document.createElement('div');
+        celda.classList.add('celda');
+        celda.dataset.fila = fila;
+        celda.dataset.col = col;
+        tablero.appendChild(celda);
+    }
+}
+
+// Instanciar las clases
+const serpiente = new Serpiente();
+const juego = new Juego(serpiente);
+const comida = new Comida();
+
+// Variables del juego
+let snake = [];
+let intervalo;
+let juegoActivo = false;
+
+// Event listeners
+startBtn.addEventListener('click', () => {
+    document.querySelectorAll('.celda').forEach(c => c.classList.remove('snake', 'snake-head', 'food'));
+    puntos.textContent = 0;
+    clearInterval(intervalo);
+
+    const centroFila = 10;
+    const centroCol = 7;
+    
+    snake = [
+        { fila: centroFila, col: centroCol },
+        { fila: centroFila, col: centroCol - 1 },
+        { fila: centroFila, col: centroCol - 2 }
+    ];
+
+    serpiente.resetDireccion();
+    serpiente.dibujarSnake(snake);
+    comida.generarComida(snake);
+    
+    juegoActivo = true;
+    intervalo = setInterval(() => {
+        if (!juegoActivo) return;
+        
+        const nuevaCabeza = juego.moverSnake(snake);
+        
+        if (juego.verificarColision(nuevaCabeza, snake)) {
+            alert('¡Game Over!');
+            clearInterval(intervalo);
+            juegoActivo = false;
+            return;
+        }
+
+        const comidaComida = juego.manejarComida(nuevaCabeza, snake, puntos);
+        
+        snake = juego.actualizarSnake(snake, nuevaCabeza, comidaComida);
+        
+        if (comidaComida) {
+            comida.generarComida(snake);
+        }
+        
+        serpiente.dibujarSnake(snake);
+    }, 150);
+});
+
+document.addEventListener('keydown', (e) => {
+    if (!juegoActivo) return;
+    
+    if (e.key === 'ArrowUp') {
+        serpiente.setProximaDireccion('arriba');
+    } else if (e.key === 'ArrowDown') {
+        serpiente.setProximaDireccion('abajo');
+    } else if (e.key === 'ArrowLeft') {
+        serpiente.setProximaDireccion('izquierda');
+    } else if (e.key === 'ArrowRight') {
+        serpiente.setProximaDireccion('derecha');
+    }
+});
